@@ -2,13 +2,9 @@ import json
 import requests
 import os
 
+from .errors import ApiError
 
 output_json = "auth.json"
-
-
-class AuthError(Exception):
-    def __init__(self, response: requests.models.Response):
-        self.response = response
 
 
 def auth(client_id: str, client_secret: str, tenant_id: str):
@@ -38,7 +34,7 @@ def auth(client_id: str, client_secret: str, tenant_id: str):
 
     # 認証失敗の場合
     if res.status_code != 200:
-        raise AuthError(res)
+        raise ApiError(res)
 
     # ファイル出力
     with open(f"./{output_json}", "w", encoding="utf-8") as f:
