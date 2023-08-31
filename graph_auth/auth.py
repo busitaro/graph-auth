@@ -1,6 +1,7 @@
 import json
 import requests
 import os
+from functools import wraps
 
 from .errors import ApiError
 
@@ -59,3 +60,40 @@ def read_token() -> str:
         auth_dict = json.load(f)
 
     return auth_dict["access_token"]
+
+
+def reauth(client_id: str, client_secret: str, tenant_id: str):
+    """
+    APIが認証切れで失敗した場合に、再認証を行うデコレータ
+
+    Params
+    -------
+    client_id: str
+        認証に使用するクライアントID
+    client_secret: str
+        認証に使用するクライアントシークレット
+    tenant_id: str
+        認証対象のテナントID
+    """
+
+    def reauth_decorator(func):
+        """
+        Params
+        -------
+        func:
+            APIを実行する関数
+        """
+
+        @wraps(func)
+        def reauth_wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except ApiError as ex:
+                if ex.status_code == 401 and ex.reason == "Unauthorized":
+                    # 認証を実行し、処理を再実行
+                    auth(client_id, client_secret, tenant_id)
+                    return func(*args, **kwargs)
+
+        return reauth_wrapper
+
+    return reauth_decorator
