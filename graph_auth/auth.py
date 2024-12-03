@@ -4,6 +4,8 @@ import os
 from functools import wraps
 
 from .errors import ApiError
+from .errors import NotAuthorizedError
+
 
 output_json = "auth.json"
 
@@ -53,7 +55,7 @@ def read_token() -> str:
     """
     # 認証ファイルのチェック
     if not os.path.exists(f"./{output_json}"):
-        raise ValueError("not authenticated yet")
+        raise NotAuthorizedError("not authenticated yet")
 
     # jsonとして読み込んで、トークンを読出し
     with open(f"./{output_json}", "r", encoding="utf-8") as f:
@@ -93,6 +95,11 @@ def reauth(client_id: str, client_secret: str, tenant_id: str):
                     # 認証を実行し、処理を再実行
                     auth(client_id, client_secret, tenant_id)
                     return func(*args, **kwargs)
+                else:
+                    raise ex
+            except NotAuthorizedError as ex:
+                auth(client_id, client_secret, tenant_id)
+                return func(*args, **kwargs)
 
         return reauth_wrapper
 
