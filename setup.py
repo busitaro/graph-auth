@@ -8,7 +8,7 @@ AUTHOR = "busitaro10"
 AUTHOR_EMAIL = "busitaro10@gmail.com"
 URL = "https://github.com/busitaro/graph-auth"
 DOWNLOAD_URL = "https://github.com/busitaro/graph-auth"
-VERSION = 0.11
+VERSION = 0.12
 
 INSTALL_REQUIRES = [
     "requests>=2.31.0",
