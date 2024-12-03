@@ -95,6 +95,11 @@ def reauth(client_id: str, client_secret: str, tenant_id: str):
                     # 認証を実行し、処理を再実行
                     auth(client_id, client_secret, tenant_id)
                     return func(*args, **kwargs)
+                else:
+                    raise ex
+            except NotAuthorizedError as ex:
+                auth(client_id, client_secret, tenant_id)
+                return func(*args, **kwargs)
 
         return reauth_wrapper
 
