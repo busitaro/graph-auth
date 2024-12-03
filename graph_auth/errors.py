@@ -8,3 +8,7 @@ class ApiError(Exception):
         self.reason = response.reason
         self.message = json.loads(response._content.decode("utf-8"))["error"]["message"]
         self.raw_response = response
+
+
+class NotAuthorizedError(Exception):
+    pass
